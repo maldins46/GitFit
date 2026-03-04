@@ -1,4 +1,8 @@
-# GitFit
+<p align="center">
+  <img src="icon.png" alt="GitFit" width="80"/>
+</p>
+
+<h1 align="center">GitFit</h1>
 
 Are you tired of seeing my contribution chart light up only when you write code?
 
@@ -240,7 +244,7 @@ schedule:
 
 ## License
 
-MIT License - feel free to use and modify!
+Apache License 2.0 - feel free to use and modify!
 
 
 
