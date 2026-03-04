@@ -72,7 +72,7 @@ def create_commits_in_private_repo(repo_owner, repo_name, token, commit_count, a
         print("No commits to create")
         return
 
-    print(f"Creating {commit_count} commits in private repo...")
+    print("Syncing to private repo...")
 
     g = Github(token)
     repo = g.get_repo(f"{repo_owner}/{repo_name}")
@@ -96,10 +96,9 @@ def create_commits_in_private_repo(repo_owner, repo_name, token, commit_count, a
         )
         commit_shas.append(commit.sha)
         base_sha = commit.sha
-        print(f"  Created commit {i+1}/{commit_count}")
 
     ref.edit(sha=base_sha)
-    print(f"Successfully pushed {commit_count} commits to private repo")
+    print("Done")
 
 
 def main():
@@ -113,13 +112,13 @@ def main():
     else:
         target_date = date.today() - timedelta(days=1)
 
-    print(f"Fetching activities for: {target_date}")
+    print("Querying Strava API...")
 
     access_token = get_strava_access_token()
     print("Got Strava access token")
 
     activities = get_activities(access_token, target_date)
-    print(f"Found {len(activities)} activities")
+    print(f"Processing activities...")
 
     if not activities:
         print("No activities to sync")
@@ -128,10 +127,8 @@ def main():
     total_commits = 0
     for activity in activities:
         commits = calculate_commits(activity)
-        activity_info = f"{activity.type}: {activity.name} ({activity.distance/1000:.1f}km)"
-        print(f"  {activity_info} -> {commits} commits")
         total_commits += commits
-        activity_info_for_commit = activity_info
+        activity_info_for_commit = f"{activity.type}: {activity.name} ({activity.distance/1000:.1f}km)"
 
     repo_owner = os.environ.get("PRIVATE_REPO_OWNER")
     repo_name = os.environ.get("PRIVATE_REPO_NAME")
@@ -145,7 +142,7 @@ def main():
         repo_owner, repo_name, repo_token, total_commits, activity_info_for_commit
     )
 
-    print(f"\nSync complete! Created {total_commits} commits")
+    print("Sync complete!")
 
 
 if __name__ == "__main__":
