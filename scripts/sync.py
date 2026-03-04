@@ -67,7 +67,7 @@ def calculate_commits(activity):
     return commits
 
 
-def create_commits_in_private_repo(repo_owner, repo_name, token, commit_count, activity_date):
+def create_commits_in_private_repo(repo_owner, repo_name, token, commit_count, activity_info):
     if commit_count == 0:
         print("No commits to create")
         return
@@ -82,10 +82,16 @@ def create_commits_in_private_repo(repo_owner, repo_name, token, commit_count, a
 
     commit_shas = []
     for i in range(commit_count):
-        blob = repo.create_git_blob("Fitness activity sync\n", "utf-8")
+        blob = repo.create_git_blob(f"Fitness activity sync: {activity_info}\n", "utf-8")
+        tree = repo.create_git_tree([{
+            "path": "activity.log",
+            "mode": "100644",
+            "type": "blob",
+            "sha": blob.sha
+        }], base_tree=repo.get_git_tree(base_sha))
         commit = repo.create_git_commit(
             message=COMMIT_MESSAGE,
-            tree=repo.create_git_tree([], base_tree=repo.get_git_tree(base_sha)),
+            tree=tree,
             parents=[repo.get_git_commit(base_sha)],
         )
         commit_shas.append(commit.sha)
@@ -125,6 +131,7 @@ def main():
         activity_info = f"{activity.type}: {activity.name} ({activity.distance/1000:.1f}km)"
         print(f"  {activity_info} -> {commits} commits")
         total_commits += commits
+        activity_info_for_commit = activity_info
 
     repo_owner = os.environ.get("PRIVATE_REPO_OWNER")
     repo_name = os.environ.get("PRIVATE_REPO_NAME")
@@ -135,7 +142,7 @@ def main():
         sys.exit(1)
 
     create_commits_in_private_repo(
-        repo_owner, repo_name, repo_token, total_commits, target_date
+        repo_owner, repo_name, repo_token, total_commits, activity_info_for_commit
     )
 
     print(f"\nSync complete! Created {total_commits} commits")
