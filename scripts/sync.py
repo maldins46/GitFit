@@ -98,7 +98,7 @@ def create_commits_in_private_repo(repo_owner, repo_name, token, commit_count, a
         base_sha = commit.sha
         print(f"  Created commit {i+1}/{commit_count}")
 
-    ref.edit(ref="refs/heads/main", sha=base_sha)
+    ref.edit(sha=base_sha)
     print(f"Successfully pushed {commit_count} commits to private repo")
 
 
