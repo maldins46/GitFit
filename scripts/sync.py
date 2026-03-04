@@ -4,7 +4,7 @@ import subprocess
 from datetime import datetime, timedelta, date
 
 import requests
-from github import Github
+from github import Github, InputGitTreeElement
 from stravalib import Client
 from dateutil import parser as date_parser
 
@@ -83,12 +83,12 @@ def create_commits_in_private_repo(repo_owner, repo_name, token, commit_count, a
     commit_shas = []
     for i in range(commit_count):
         blob = repo.create_git_blob(f"Fitness activity sync: {activity_info}\n", "utf-8")
-        tree = repo.create_git_tree([{
-            "path": "activity.log",
-            "mode": "100644",
-            "type": "blob",
-            "sha": blob.sha
-        }], base_tree=repo.get_git_tree(base_sha))
+        tree = repo.create_git_tree([InputGitTreeElement(
+            path="activity.log",
+            mode="100644",
+            type="blob",
+            sha=blob.sha
+        )], base_tree=repo.get_git_tree(base_sha))
         commit = repo.create_git_commit(
             message=COMMIT_MESSAGE,
             tree=tree,
